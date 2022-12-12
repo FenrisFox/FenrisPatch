@@ -19,7 +19,7 @@ public final class Fenrispatch extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown
+        // Plugin shutdown logic
         Bukkit.getLogger().info("Shutting down FenrisPatch");
     }
 }
