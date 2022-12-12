@@ -11,7 +11,7 @@ public final class Fenrispatch extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        Bukkit.getLogger().info("Initiating FenrisPatch");
+        Bukkit.getLogger().info("Initialising FenrisPatch");
         new AlbertListener(this);
         new RoachListener(this);
         new MobStackListener(this);

@@ -1,7 +1,9 @@
 package fenrisfox86.fenrispatch.handlers;
 
 import fenrisfox86.fenrispatch.Fenrispatch;
+import fenrisfox86.fenrispatch.util.Targeter;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -22,7 +24,8 @@ public class MobStackListener extends AbstractEventListener {
     @EventHandler
     public void onMobInteract(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
-        Entity entity = event.getRightClicked();
+        //Entity entity = event.getRightClicked();
+        Entity entity = Targeter.getTargetEntity(player, player.getPassengers());
         if (entity instanceof LivingEntity) {
             setTopRider(player, entity);
         }
