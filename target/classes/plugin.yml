@@ -1,0 +1,6 @@
+name: Fenrispatch
+version: '1.0-SNAPSHOT'
+main: fenrisfox86.fenrispatch.Fenrispatch
+api-version: 1.19
+authors: [ FenrisFox86 ]
+description: FenrisFox86's custom patch for FenrisRPG SMP
