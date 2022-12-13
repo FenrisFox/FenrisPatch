@@ -4,20 +4,22 @@ import fenrisfox86.fenrispatch.Fenrispatch;
 import fenrisfox86.fenrispatch.util.Targeter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Tag;
-import org.bukkit.World;
 import org.bukkit.entity.*;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
-public class MobStackListener extends AbstractEventListener {
+public class MobStackListener implements Listener {
     public MobStackListener(Fenrispatch plugin) {
-        super(plugin);
+        Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
@@ -42,13 +44,14 @@ public class MobStackListener extends AbstractEventListener {
     }
 
     @EventHandler
-    public void entitySling(PlayerInteractEntityEvent event) {
+    public void entitySling(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
-        final boolean holds_sling_item = player.getInventory().getItemInMainHand().getType() == Material.LEAD;
-        if (holds_sling_item && getBaseRider(event.getRightClicked()) == player) {
-            Vector movementVector = player.getLocation().getDirection().normalize().multiply(2);
-            slingTopRider(player, movementVector);
-            event.setCancelled(true);
+        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_AIR) {
+            final boolean holds_sling_item = player.getInventory().getItemInMainHand().getType() == Material.LEAD;
+            if (holds_sling_item) {
+                Vector movementVector = player.getLocation().getDirection().normalize().multiply(2);
+                slingTopRider(player, movementVector);
+            }
         }
     }
 
