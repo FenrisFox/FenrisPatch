@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Fenrispatch extends JavaPlugin {
-
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -16,7 +15,6 @@ public final class Fenrispatch extends JavaPlugin {
         new RoachListener(this);
         new MobStackListener(this);
     }
-
     @Override
     public void onDisable() {
         // Plugin shutdown logic

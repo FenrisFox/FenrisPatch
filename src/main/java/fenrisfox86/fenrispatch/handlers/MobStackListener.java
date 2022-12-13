@@ -4,15 +4,13 @@ import fenrisfox86.fenrispatch.Fenrispatch;
 import fenrisfox86.fenrispatch.util.Targeter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
@@ -23,17 +21,20 @@ public class MobStackListener extends AbstractEventListener {
     }
 
     @EventHandler
-    public void onMobInteract(PlayerInteractEntityEvent event) {
-        Player player = event.getPlayer();
-        // Entity entity = event.getRightClicked();
-        Entity entity = Targeter.getTargetEntity(player, 5, player.getPassengers());
-        if (entity instanceof LivingEntity) {
-            setTopRider(player, entity);
+    public void entityPickup(EntityDamageByEntityEvent event) {
+        Entity damager = event.getDamager();
+        if (damager instanceof Player){
+            Player player = (Player)damager;
+            if (player.getInventory().getItemInMainHand().getType() == Material.LEAD) {
+                Entity target = Targeter.getTargetEntity(player, (x) -> x.getVehicle() != player, LivingEntity.class);
+                if (target != null) setTopRider(player, target);
+                if (event.getEntity().getVehicle() == player || event.getEntity() == target) event.setCancelled(true);
+            }
         }
     }
 
     @EventHandler
-    public void onSneak(PlayerToggleSneakEvent event) {
+    public void massDismount(PlayerToggleSneakEvent event) {
         if (event.isSneaking()) {
             Player player = event.getPlayer();
             dropRiders(player);
@@ -41,11 +42,12 @@ public class MobStackListener extends AbstractEventListener {
     }
 
     @EventHandler
-    public void onPlayerDropItem(PlayerDropItemEvent event) {
-        if (!event.getPlayer().getPassengers().isEmpty()) {
-            Vector movementVector = event.getPlayer().getLocation().getDirection()
-                    .normalize().multiply(2);
-            slingTopRider(event.getPlayer(), movementVector);
+    public void entitySling(PlayerInteractEntityEvent event) {
+        final Player player = event.getPlayer();
+        final boolean holds_sling_item = player.getInventory().getItemInMainHand().getType() == Material.LEAD;
+        if (holds_sling_item && getBaseRider(event.getRightClicked()) == player) {
+            Vector movementVector = player.getLocation().getDirection().normalize().multiply(2);
+            slingTopRider(player, movementVector);
             event.setCancelled(true);
         }
     }
