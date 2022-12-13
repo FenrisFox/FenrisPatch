@@ -55,6 +55,11 @@ public class MobStackListener implements Listener {
         }
     }
 
+    public static Entity getTopRider(Entity vehicle) {
+        if (vehicle.getPassengers().isEmpty()) return vehicle;
+        return getTopRider(vehicle.getPassengers().get(0));
+    }
+
     public static void setTopRider(Entity vehicle, Entity passenger_in) {
         if (passenger_in != vehicle) {
             if (vehicle.getPassengers().isEmpty()) {vehicle.addPassenger(passenger_in);}
