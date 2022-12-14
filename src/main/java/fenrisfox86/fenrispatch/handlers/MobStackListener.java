@@ -5,14 +5,11 @@ import fenrisfox86.fenrispatch.util.Targeter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
@@ -43,14 +40,29 @@ public class MobStackListener implements Listener {
         }
     }
 
-    @EventHandler
+    /*@EventHandler
     public void entitySling(PlayerInteractEvent event) {
+        Bukkit.getLogger().info("handling PlayerInteractEntityEvent");
         final Player player = event.getPlayer();
-        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_AIR) {
+        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             final boolean holds_sling_item = player.getInventory().getItemInMainHand().getType() == Material.LEAD;
             if (holds_sling_item) {
                 Vector movementVector = player.getLocation().getDirection().normalize().multiply(2);
-                slingTopRider(player, movementVector);
+                slingEntity(getTopRider(player), movementVector);
+            }
+        }
+    }*/
+
+    @EventHandler
+    public void entitySling(PlayerInteractEntityEvent event) {
+        final Player player = event.getPlayer();
+        if (event.getRightClicked().getVehicle() == player) {
+            final boolean holds_sling_item = player.getInventory().getItemInMainHand().getType() == Material.LEAD;
+            if (holds_sling_item) {
+                Vector movementVector = player.getLocation().getDirection().normalize().multiply(2);
+                Bukkit.getLogger().info("Slinging top entity");
+                slingEntity(getTopRider(player), movementVector);
+                event.setCancelled(true);
             }
         }
     }
@@ -62,19 +74,13 @@ public class MobStackListener implements Listener {
 
     public static void setTopRider(Entity vehicle, Entity passenger_in) {
         if (passenger_in != vehicle) {
-            if (vehicle.getPassengers().isEmpty()) {vehicle.addPassenger(passenger_in);}
-            else {setTopRider(vehicle.getPassengers().get(0), passenger_in);}
+            getTopRider(vehicle).addPassenger(passenger_in);}
         }
-    }
 
-    public static void slingTopRider(Entity entity, Vector sling_vector) {
-        if (!entity.getPassengers().isEmpty()) {
-            slingTopRider(entity.getPassengers().get(0), sling_vector);
-        } else if (entity.isInsideVehicle()) {
-            entity.leaveVehicle();
-            entity.setVelocity(sling_vector);
-            entity.setFallDistance(-1000000);
-        }
+    public static void slingEntity(Entity entity, Vector sling_vector) {
+        entity.leaveVehicle();
+        entity.setVelocity(sling_vector);
+        entity.setFallDistance(-1000000);
     }
 
     public static Entity getBaseRider(Entity mount) {
