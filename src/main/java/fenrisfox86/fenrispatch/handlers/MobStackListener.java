@@ -5,14 +5,10 @@ import fenrisfox86.fenrispatch.util.Targeter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 

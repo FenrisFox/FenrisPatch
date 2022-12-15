@@ -3,4 +3,6 @@ fenrisfox86\fenrispatch\handlers\MobStackListener.class
 fenrisfox86\fenrispatch\util\Targeter.class
 fenrisfox86\fenrispatch\handlers\AlbertListener.class
 fenrisfox86\fenrispatch\handlers\AbstractEventListener.class
+fenrisfox86\fenrispatch\handlers\ProtocolLibListener.class
+fenrisfox86\fenrispatch\packet_listeners\RideListener.class
 fenrisfox86\fenrispatch\handlers\RoachListener.class
