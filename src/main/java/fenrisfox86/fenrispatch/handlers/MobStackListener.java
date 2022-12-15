@@ -5,16 +5,22 @@ import fenrisfox86.fenrispatch.util.Targeter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.util.Vector;
 
 import java.util.Objects;
 
 public class MobStackListener implements Listener {
+    public final Material stack_item = Material.BOW;
+
     public MobStackListener(Fenrispatch plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -24,9 +30,9 @@ public class MobStackListener implements Listener {
         Entity damager = event.getDamager();
         if (damager instanceof Player){
             Player player = (Player)damager;
-            if (player.getInventory().getItemInMainHand().getType() == Material.LEAD) {
+            if (player.getInventory().getItemInMainHand().getType() == stack_item) {
                 Entity target = Targeter.getTargetEntity(player, (x) -> x.getVehicle() != player, LivingEntity.class);
-                if (target != null) setTopRider(player, target);
+                if (target != null) getTopRider(player).addPassenger(target);
                 if (event.getEntity().getVehicle() == player || event.getEntity() == target) event.setCancelled(true);
             }
         }
@@ -40,30 +46,13 @@ public class MobStackListener implements Listener {
         }
     }
 
-    /*@EventHandler
-    public void entitySling(PlayerInteractEvent event) {
-        Bukkit.getLogger().info("handling PlayerInteractEntityEvent");
-        final Player player = event.getPlayer();
-        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            final boolean holds_sling_item = player.getInventory().getItemInMainHand().getType() == Material.LEAD;
-            if (holds_sling_item) {
-                Vector movementVector = player.getLocation().getDirection().normalize().multiply(2);
-                slingEntity(getTopRider(player), movementVector);
-            }
-        }
-    }*/
-
     @EventHandler
-    public void entitySling(PlayerInteractEntityEvent event) {
-        final Player player = event.getPlayer();
-        if (event.getRightClicked().getVehicle() == player) {
-            final boolean holds_sling_item = player.getInventory().getItemInMainHand().getType() == Material.LEAD;
-            if (holds_sling_item) {
-                Vector movementVector = player.getLocation().getDirection().normalize().multiply(2);
-                Bukkit.getLogger().info("Slinging top entity");
-                slingEntity(getTopRider(player), movementVector);
-                event.setCancelled(true);
-            }
+    public void onPlayerShootArrow(ProjectileLaunchEvent event) {
+        ProjectileSource source = event.getEntity().getShooter();
+        if (source instanceof HumanEntity && !((HumanEntity) source).getPassengers().isEmpty()) {
+            Vector velocity = event.getEntity().getVelocity();
+            sling(getTopRider((HumanEntity) source), velocity);
+            event.setCancelled(true);
         }
     }
 
@@ -72,12 +61,7 @@ public class MobStackListener implements Listener {
         return getTopRider(vehicle.getPassengers().get(0));
     }
 
-    public static void setTopRider(Entity vehicle, Entity passenger_in) {
-        if (passenger_in != vehicle) {
-            getTopRider(vehicle).addPassenger(passenger_in);}
-        }
-
-    public static void slingEntity(Entity entity, Vector sling_vector) {
+    public static void sling(Entity entity, Vector sling_vector) {
         entity.leaveVehicle();
         entity.setVelocity(sling_vector);
         entity.setFallDistance(-1000000);
