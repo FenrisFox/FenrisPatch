@@ -11,6 +11,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.sql.Array;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class RideListener extends PacketAdapter {
@@ -28,17 +30,23 @@ public class RideListener extends PacketAdapter {
         if(entity != null && Objects.equals(entity.getCustomName(), "Roach")) {
             float side = packet.getFloat().read(0);
             float forward = packet.getFloat().read(1);
+            boolean jump = packet.getBooleans().read(0);
             Location location = entity.getLocation();
-            Vector velocity = player.getLocation().getDirection().setY(0).normalize();
 
-            if (forward==0 && side == 0) {velocity.multiply(0);}
-            else {
-                if (forward > 0) velocity.multiply(2);
-                else velocity.multiply(-2);
-                /*if (side > 0) location.setPitch(entity.getLocation().getPitch() + 20F);
-                else if (side < 0 ) {location.setPitch(entity.getLocation().getPitch() + -20F);}*/
+            Vector jump_vector = new Vector (0, 0, 0);
+            Vector velocity = new Vector(0, 0, 0);
+            if (forward != 0.0 || side != 0.0) {
+                velocity = player.getLocation().getDirection().setY(0).normalize();
+
+                if (forward > 0) velocity.multiply(1);
+                else velocity.multiply(-1);
             }
-            Bukkit.getLogger().info(velocity.toString());
+            if (jump && entity.isOnGround()) {
+                velocity.setY(2);
+            }
+
+            velocity = velocity.add(velocity);
+
             entity.getLocation().setPitch(player.getLocation().getPitch());
             entity.setVelocity(velocity);
         }
